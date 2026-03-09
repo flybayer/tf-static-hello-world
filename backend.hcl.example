@@ -1,0 +1,5 @@
+bucket         = "REPLACE_WITH_BACKEND_BUCKET_NAME"
+key            = "env/prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "REPLACE_WITH_DYNAMODB_TABLE_NAME"
+encrypt        = true

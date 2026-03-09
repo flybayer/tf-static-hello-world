@@ -5,6 +5,7 @@ This project deploys a minimal static `hello world` site on AWS using:
 - S3 (private bucket for object storage)
 - CloudFront (public HTTPS endpoint)
 - Origin Access Control (CloudFront can read S3, public cannot)
+- S3 + DynamoDB backend for Terraform/OpenTofu remote state and locking
 
 The page content is managed directly in Terraform/OpenTofu (`aws_s3_object.index_html`).
 
@@ -12,12 +13,35 @@ The page content is managed directly in Terraform/OpenTofu (`aws_s3_object.index
 
 - OpenTofu installed (`tofu` command)
 - AWS credentials configured (environment variables, profile, or IAM role)
-- Permission to create S3, CloudFront, and IAM policy resources
+- Permission to create S3, CloudFront, IAM policy, and DynamoDB resources
 
-## Deploy
+## 1) Bootstrap remote state backend
+
+Create the backend infra once (S3 bucket + DynamoDB lock table):
 
 ```bash
-tofu init
+tofu -chdir=bootstrap init
+tofu -chdir=bootstrap apply
+```
+
+Then create `backend.hcl` from the example and fill values from bootstrap outputs:
+
+```bash
+cp backend.hcl.example backend.hcl
+tofu -chdir=bootstrap output
+```
+
+Recommended state key is already set to `env/prod/terraform.tfstate`.
+
+## 2) Initialize this stack with remote state
+
+```bash
+tofu init -migrate-state -backend-config=backend.hcl
+```
+
+## 3) Deploy app infrastructure
+
+```bash
 tofu plan
 tofu apply
 ```
@@ -35,6 +59,12 @@ CloudFront deployment can take several minutes.
 - `aws_region` (default: `us-east-1`)
 - `project_name` (default: `hello-world-static-site`)
 - `bucket_name` (default: empty, auto-generated)
+
+### Bootstrap-only variables
+
+- `backend_bucket_name` (default: empty, auto-generated)
+- `dynamodb_table_name` (default: `hello-world-static-site-tf-locks`)
+- `state_key` (default: `env/prod/terraform.tfstate`)
 
 Example:
 
