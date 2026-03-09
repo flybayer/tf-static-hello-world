@@ -24,19 +24,12 @@ tofu -chdir=bootstrap init
 tofu -chdir=bootstrap apply
 ```
 
-Then create `backend.hcl` from the example and fill values from bootstrap outputs:
-
-```bash
-cp backend.hcl.example backend.hcl
-tofu -chdir=bootstrap output
-```
-
-Recommended state key is already set to `env/prod/terraform.tfstate`.
+Backend values are hardcoded in `main.tf` and use state key `env/prod/terraform.tfstate`.
 
 ## 2) Initialize this stack with remote state
 
 ```bash
-tofu init -migrate-state -backend-config=backend.hcl
+tofu init -migrate-state
 ```
 
 ## 3) Deploy app infrastructure
