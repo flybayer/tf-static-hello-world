@@ -35,8 +35,8 @@ tofu init -migrate-state
 ## 3) Deploy app infrastructure
 
 ```bash
-tofu plan
-tofu apply
+tofu plan -var='site_name_slug=my-hello-site'
+tofu apply -var='site_name_slug=my-hello-site'
 ```
 
 After apply, get the site URL:
@@ -47,10 +47,13 @@ tofu output -raw site_url
 
 CloudFront deployment can take several minutes.
 
+## Required variables
+
+- `site_name_slug` (no default, lowercase letters/numbers/hyphens)
+
 ## Optional variables
 
 - `aws_region` (default: `us-east-1`)
-- `project_name` (default: `hello-world-static-site`)
 - `bucket_name` (default: empty, auto-generated)
 
 ### Bootstrap-only variables
@@ -62,7 +65,7 @@ CloudFront deployment can take several minutes.
 Example:
 
 ```bash
-tofu apply -var='aws_region=us-east-1' -var='project_name=my-hello-site'
+tofu apply -var='site_name_slug=my-hello-site' -var='aws_region=us-east-1'
 ```
 
 ## Destroy

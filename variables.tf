@@ -4,14 +4,13 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "project_name" {
-  description = "Project prefix used in generated resource names."
+variable "site_name_slug" {
+  description = "Required site slug used for infrastructure naming and page content."
   type        = string
-  default     = "hello-world-static-site"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]+$", var.project_name))
-    error_message = "project_name must contain only lowercase letters, numbers, and hyphens."
+    condition     = can(regex("^[a-z0-9-]+$", var.site_name_slug))
+    error_message = "site_name_slug must contain only lowercase letters, numbers, and hyphens."
   }
 }
 

@@ -28,7 +28,7 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
 }
 
 locals {
-  bucket_name = var.bucket_name != "" ? var.bucket_name : lower("${var.project_name}-${data.aws_caller_identity.current.account_id}-${var.aws_region}")
+  bucket_name = var.bucket_name != "" ? var.bucket_name : lower("${var.site_name_slug}-${data.aws_caller_identity.current.account_id}-${var.aws_region}")
 
   index_html = <<-HTML
     <!doctype html>
@@ -36,7 +36,7 @@ locals {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Hello world</title>
+        <title>${var.site_name_slug}</title>
         <style>
           :root {
             color-scheme: light;
@@ -63,7 +63,7 @@ locals {
         </style>
       </head>
       <body>
-        <h1>Hello world from OpenTofu + AWS</h1>
+        <h1>Hello World from ${var.site_name_slug}</h1>
       </body>
     </html>
   HTML
@@ -100,7 +100,7 @@ resource "aws_s3_object" "index_html" {
 }
 
 resource "aws_cloudfront_origin_access_control" "site" {
-  name                              = "${var.project_name}-oac"
+  name                              = "${var.site_name_slug}-oac"
   description                       = "OAC for ${local.bucket_name}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -110,7 +110,7 @@ resource "aws_cloudfront_origin_access_control" "site" {
 resource "aws_cloudfront_distribution" "site" {
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Hello world static site"
+  comment             = var.site_name_slug
   default_root_object = "index.html"
 
   origin {
